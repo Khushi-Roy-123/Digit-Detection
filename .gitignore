@@ -1,0 +1,18 @@
+# Data
+data/
+*.csv
+*.zip
+
+# Models (exclude if >100MB, but ours is 90MB so it's borderline okay. 
+# Better to exclude if we don't want to push it, but for Streamlit Cloud deployment without training, we usually NEED the model.
+# I will NOT exclude models/ folder so it gets pushed.
+# But I will exclude the CSVs to save space.
+
+# Environment
+.venv
+__pycache__
+*.pyc
+
+# IDEs
+.vscode
+.idea
