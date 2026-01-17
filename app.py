@@ -39,23 +39,70 @@ if uploaded_file is not None:
     st.image(image, caption='Uploaded Image', use_column_width=False, width=200)
     
     # Checkbox to invert image
-    invert = st.checkbox("Invert Image (Check this if image is Black digit on White background)", value=True)
+    invert = st.checkbox("Invert Image (Select this if image is Black digit on White background)", value=True)
     
-    if invert:
-        image = ImageOps.invert(image.convert('RGB'))
-    
-    # Convert to grayscale
-    img_gray = image.convert('L')
-    
-    # Resize to 28x28
-    img_resized = img_gray.resize((28, 28))
+    def preprocess_image(img, invert_colors):
+        # 1. Convert to grayscale
+        img_gray = img.convert('L')
+        
+        # 2. Invert if requested (MNIST is white on black)
+        # If user uploaded black on white, we MUST invert.
+        if invert_colors:
+            img_gray = ImageOps.invert(img_gray)
+            
+        # 3. Thresholding to clear up noise and facilitate cropping
+        # Convert to numpy array
+        img_arr = np.array(img_gray)
+        
+        # Simple threshold: everything below 50 becomes 0, else 255.
+        # This helps in removing noise and finding the bounding box of the digit.
+        # Ensure we don't accidentally kill soft edges too much, but for bounding box it's good.
+        # For the final image, we might want to keep the original grayscale values but cropped.
+        
+        # Let's find the bounding box using a binary version
+        binary_arr = np.where(img_arr > 50, 255, 0).astype(np.uint8)
+        coords = np.argwhere(binary_arr > 0)
+        
+        # Determine bounding box
+        if coords.size == 0:
+            # Empty image
+            return img_gray.resize((28, 28))
+            
+        y_min, x_min = coords.min(axis=0)
+        y_max, x_max = coords.max(axis=0)
+        
+        # Crop the ORIGINAL grayscale image (not the binary one)
+        cropped = img_gray.crop((x_min, y_min, x_max+1, y_max+1))
+        
+        # 4. Resize with aspect ratio preservation to fit in 20x20 box
+        # MNIST digits are roughly 20x20 inside a 28x28 box
+        output_size = 20
+        w, h = cropped.size
+        scale = output_size / max(w, h)
+        new_w, new_h = int(w * scale), int(h * scale)
+        
+        resized = cropped.resize((new_w, new_h), Image.Resampling.LANCZOS)
+        
+        # 5. Paste into 28x28 black canvas (centered)
+        final_img = Image.new('L', (28, 28), 0)
+        
+        # Calculate paste position (center)
+        paste_x = (28 - new_w) // 2
+        paste_y = (28 - new_h) // 2
+        
+        final_img.paste(resized, (paste_x, paste_y))
+        
+        return final_img
+
+    # Perform preprocessing
+    img_processed = preprocess_image(image, invert)
     
     # Display processed image
-    st.write("Processed Image (28x28 Grayscale):")
-    st.image(img_resized, width=100)
+    st.write("Processed Image (Input to Model):")
+    st.image(img_processed, width=100, caption="28x28 Centered")
     
     # Flatten and Normalize
-    img_array = np.array(img_resized)
+    img_array = np.array(img_processed)
     img_flat = img_array.flatten()
     img_normalized = img_flat / 255.0
     
