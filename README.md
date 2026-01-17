@@ -5,8 +5,7 @@
 [![Streamlit](https://img.shields.io/badge/Streamlit-Live%20Demo-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://streamlit.io/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
-> **Live Demo:** [Click Here to Open App](https://share.streamlit.io/) _(Replace with your verified deployment URL)_
-
+> **Live Demo:** [Click Here to Open App](https://digit-detection-wqj3xezwsiexcxcuoe8mto.streamlit.app/)
 An end-to-end **Machine Learning** project that accurately identifies handwritten digits (0-9). Built with a robust **Random Forest** classifier and deployed as an interactive web application using **Streamlit**.
 
 ---
@@ -113,20 +112,4 @@ This script will:
 
 ---
 
-## 🤝 Contributing
 
-Contributions are welcome!
-
-1. Fork the project.
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`).
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`).
-4. Push to the branch (`git push origin feature/AmazingFeature`).
-5. Open a Pull Request.
-
----
-
-<div align="center">
-
-**Built with ❤️ by Khushi Roy**
-
-</div>
